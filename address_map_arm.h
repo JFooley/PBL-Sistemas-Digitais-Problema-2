@@ -1,3 +1,8 @@
+/* Enderecos da GPU*/
+#define DATA_A 0x80 // Registrador com opcode e endereçamentos
+#define DATA_B 0x70 // Registradores de dados
+#define START 0xc0  // WRREG
+
 /* Memory */
 #define DDR_BASE               0x00000000
 #define DDR_SPAN               0x3FFFFFFF
