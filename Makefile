@@ -1,7 +1,6 @@
-obj-m += video_board_PBL.o
-
+obj-m += acessKernel.o
+KERNEL_DIR = /usr/src/$(shell uname -r)
 all:
-    make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
-
+	$(MAKE) -C $(KERNEL_DIR) SUBDIRS=$(PWD) modules
 clean:
-    make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	rm -rf *.o *.ko *.mod.* *.symvers *.order *~
