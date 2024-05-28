@@ -9,7 +9,7 @@ int main(void)
     int i, fd;
     char ch, write_buf[100], read_buf[100];
 
-    fd = open(DEVICE, O_RDWR);
+    fd = open(DEVICE, (O_RDWR | O_SYNC));
 
     if (fd == -1)
     { // Fazer a lógica para criuaera o arquivo caso ele nãoi exista
