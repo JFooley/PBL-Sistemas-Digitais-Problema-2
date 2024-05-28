@@ -23,85 +23,68 @@
 #define REF_POINT_MASK 0b111111111          // 9 bits
 
 static int WBR_BG(unsigned int R, unsigned int G, unsigned int B) {
-    unsigned int dataBus[2];
-    
-    unsigned int dataB = (R & 0b111) << 0;
-    dataB |= (G & 0b111) << 3;
-    dataB |= (B & 0b111) << 6;
+    unsigned int word = 0;
 
-    unsigned int dataA = 0;
+    word |= ((unsigned int)R & 0b111) << 9;
+    word |= ((unsigned int)G & 0b111) << 12;
+    word |= ((unsigned int)B & 0b111) << 15;
 
-    dataBus[0] = dataA;
-    dataBus[1] = dataB;
-
-    return dataBus;
+    return word;
 }
 
 static int WBR_S(unsigned int reg, unsigned int offset, unsigned int X, unsigned int Y, unsigned int onScreen) {
-    unsigned int dataBus[2];
+    unsigned int word = 0;
 
-    unsigned int dataA |= ((unsigned int)WBR_OPCODE & OPCODE_MASK) << 0;
-    dataA |= ((unsigned int)reg & REG_MASK) << 4;
+    word |= ((unsigned int)WBR_OPCODE & OPCODE_MASK) << 0;
+    word |= ((unsigned int)reg & REG_MASK) << 4;
 
-    unsigned int dataB |= ((unsigned int)offset & OFFSET_MASK) << 0;
-    dataB |= ((unsigned int)Y & 0b111111111) << 9;
-    dataB |= ((unsigned int)X & 0b111111111) << 19;
-    dataB |= ((unsigned int)onScreen & 0b111111111) << 29;
+    word |= ((unsigned int)offset & OFFSET_MASK) << 9;
+    word |= ((unsigned int)Y & 0b111111111) << 18;
+    word |= ((unsigned int)X & 0b111111111) << 28;
+    word |= ((unsigned int)onScreen & 0b111111111) << 38;
 
-    dataBus[0] = dataA;
-    dataBus[1] = dataB;
-
-    return dataBus;
+    return word;
 }
 
 static int WSM(unsigned int mem_address, unsigned int R, unsigned int G, unsigned int B) {
-    unsigned int dataBus[2];
+    unsigned int word = 0;
 
-    unsigned int dataA |= ((unsigned int)WSM_OPCODE & OPCODE_MASK) << 0;
-    dataA |= ((unsigned int)mem_address & SMEN_OFFSET_MASK) << 4;
+    word |= ((unsigned int)WSM_OPCODE & OPCODE_MASK) << 0;
+    word |= ((unsigned int)mem_address & SMEN_OFFSET_MASK) << 4;
 
-    unsigned int dataB = ((unsigned int)R & 0b111) << 0;
-    dataB |= ((unsigned int)G & 0b111) << 3;
-    dataB |= ((unsigned int)B & 0b111) << 6; 
+    word |= ((unsigned int)R & 0b111) << 18;
+    word |= ((unsigned int)G & 0b111) << 21;
+    word |= ((unsigned int)B & 0b111) << 24; 
 
-    dataBus[0] = dataA;
-    dataBus[1] = dataB;
-
-    return dataBus;
+    return word;
 }
 
 static int WBM(unsigned int mem_address, unsigned int R, unsigned int G, unsigned int B) {
-    unsigned int dataBus[2];
+    unsigned int word = 0;
 
-    unsigned int dataA |= ((unsigned int)WBM_OPCODE & OPCODE_MASK) << 0;
-    dataA |= ((unsigned int)mem_address & BMEN_OFFSET_MASK) << 4;
+    word |= ((unsigned int)WSM_OPCODE & OPCODE_MASK) << 0;
+    word |= ((unsigned int)mem_address & SMEN_OFFSET_MASK) << 4;
 
-    unsigned int dataB = ((unsigned int)R & 0b111) << 0;
-    dataB |= ((unsigned int)G & 0b111) << 3;
-    dataB |= ((unsigned int)B & 0b111) << 6; 
+    word |= ((unsigned int)R & 0b111) << 18;
+    word |= ((unsigned int)G & 0b111) << 21;
+    word |= ((unsigned int)B & 0b111) << 24;  
 
-    dataBus[0] = dataA;
-    dataBus[1] = dataB;
-
-    return dataBus;
+    return word;
 }
 
 static int DP(unsigned int address, unsigned int ref_point_X, unsigned int ref_point_Y, unsigned int size, unsigned int R, unsigned int G, unsigned int B, unsigned int shape) {
-    unsigned int dataBus[2];
+    unsigned int word = 0;
 
-    unsigned int dataA |= ((unsigned int)DP_OPCODE & OPCODE_MASK) << 0;
-    dataA |= ((unsigned int)address & DPMEN_OFFSET_MASK) << 4;
+    word |= ((unsigned int)DP_OPCODE & OPCODE_MASK) << 0;
+    word |= ((unsigned int)address & DPMEN_OFFSET_MASK) << 4;
 
-    unsigned int dataB |= ((unsigned int)ref_point_X & REF_POINT_MASK) << 0;
-    dataB |= ((unsigned int)ref_point_Y & REF_POINT_MASK) << 9;
-    dataB |= ((unsigned int)size & 0b1111) << 13;
-    dataB |= ((unsigned int)R & 0b111) << 22;
-    dataB |= ((unsigned int)G & 0b111) << 25;
-    dataB |= ((unsigned int)B & 0b111) << 28;
-    dataB |= ((unsigned int)shape & 0b1) << 31;
+    word |= ((unsigned int)ref_point_X & REF_POINT_MASK) << 8;
+    word |= ((unsigned int)ref_point_Y & REF_POINT_MASK) << 17;
+    word |= ((unsigned int)size & 0b1111) << 26;
+    word |= ((unsigned int)R & 0b111) << 30;
+    word |= ((unsigned int)G & 0b111) << 33;
+    word |= ((unsigned int)B & 0b111) << 36;
+    word |= ((unsigned int)shape & 0b1) << 39;
 
-    dataBus[0] = dataA;
-    dataBus[1] = dataB;
-
-    return dataBus;
+    return word;
 }
