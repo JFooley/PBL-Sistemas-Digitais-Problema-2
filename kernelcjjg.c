@@ -56,11 +56,6 @@ int charArrayToInt(const char *array) {
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
-
-    *pointer_dataA = 0;
-    *pointer_dataB = 0;
-    printk(KERN_INFO "Data A reset: %d\n", *pointer_dataA);
-    printk(KERN_INFO "Data B reset: %d\n", *pointer_dataB);
     // Copiar os dados do buffer do usuário para o buffer do dispositivo
     if (copy_from_user(device_buffer, buffer, len) != 0) {
         printk(KERN_ERR "Falha ao copiar dados do buffer de usuário para o buffer do dispositivo\n");
