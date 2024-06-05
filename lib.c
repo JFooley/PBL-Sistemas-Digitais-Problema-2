@@ -1,6 +1,9 @@
-#include "instructions.h"
 #include "address_map_arm.h"
-#include <asm/io.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 
 // Instrução
 #define WBR_OPCODE 0b0000
@@ -22,17 +25,76 @@
 #define DPMEN_OFFSET_MASK 0b1111            // 4 bits
 #define REF_POINT_MASK 0b111111111          // 9 bits
 
-static int WBR_BG(unsigned int R, unsigned int G, unsigned int B) {
-    unsigned int word = 0;
+#define DEVICE_FILE "/dev/gpucjjg"
 
+int simple_driver_open() {
+    int fd = open(DEVICE_FILE, O_RDWR);
+    if (fd < 0) {
+        perror("Falha ao abrir o dispositivo");
+        return -1;
+    }
+    printf("Dispositivo aberto com sucesso!\n");
+    return fd;
+}
+
+int simple_driver_close(int fd) {
+    int ret = close(fd);
+    if (ret < 0) {
+        perror("Falha ao fechar o dispositivo");
+        return -1;
+    }
+    printf("Dispositivo fechado com sucesso!\n");
+    return 0;
+}
+
+void intToCharArray(int number, char *array) {
+    // Itera sobre os chars do array
+    int i;
+    for (i = 0; i < 8; i++) {
+        // Copia 8 bits do número para o char atual do array
+        array[i] = (unsigned char)((number >> (i * 8)) & 0xFF);
+    }
+}
+
+void printBinaryArray(const unsigned char *array) {
+    int i;
+    printf("Valores em data:\n");
+    for (i = 0; i < 8; i++) {
+        printf("%u ", array[i]);
+    }
+    printf("\n");
+    printf("\n");
+}
+
+static void WBR_BG(unsigned int R, unsigned int G, unsigned int B) {
+    unsigned int word = 0;
+    
     word |= ((unsigned int)R & 0b111) << 9;
     word |= ((unsigned int)G & 0b111) << 12;
     word |= ((unsigned int)B & 0b111) << 15;
 
-    return word;
+    static unsigned char array[8];
+
+    intToCharArray(word, array);
+
+    // debug
+    printBinaryArray(array);
+
+    int fd = simple_driver_open();
+    if (fd < 0) {
+        return EXIT_FAILURE;
+    }
+
+    ssize_t bytes_written = write(fd, array, sizeof(array));
+    if (bytes_written < 0) {
+        perror("Falha ao escrever no dispositivo");
+        return -1;
+    }
+
+    simple_driver_close(fd);
 }
 
-static int WBR_S(unsigned int reg, unsigned int offset, unsigned int X, unsigned int Y, unsigned int onScreen) {
+static void WBR_S(unsigned int reg, unsigned int offset, unsigned int X, unsigned int Y, unsigned int onScreen) {
     unsigned int word = 0;
 
     word |= ((unsigned int)WBR_OPCODE & OPCODE_MASK) << 0;
@@ -43,10 +105,9 @@ static int WBR_S(unsigned int reg, unsigned int offset, unsigned int X, unsigned
     word |= ((unsigned int)X & 0b111111111) << 28;
     word |= ((unsigned int)onScreen & 0b111111111) << 38;
 
-    return word;
 }
 
-static int WSM(unsigned int mem_address, unsigned int R, unsigned int G, unsigned int B) {
+static void WSM(unsigned int mem_address, unsigned int R, unsigned int G, unsigned int B) {
     unsigned int word = 0;
 
     word |= ((unsigned int)WSM_OPCODE & OPCODE_MASK) << 0;
@@ -56,10 +117,9 @@ static int WSM(unsigned int mem_address, unsigned int R, unsigned int G, unsigne
     word |= ((unsigned int)G & 0b111) << 21;
     word |= ((unsigned int)B & 0b111) << 24; 
 
-    return word;
 }
 
-static int WBM(unsigned int mem_address, unsigned int R, unsigned int G, unsigned int B) {
+static void WBM(unsigned int mem_address, unsigned int R, unsigned int G, unsigned int B) {
     unsigned int word = 0;
 
     word |= ((unsigned int)WSM_OPCODE & OPCODE_MASK) << 0;
@@ -69,10 +129,9 @@ static int WBM(unsigned int mem_address, unsigned int R, unsigned int G, unsigne
     word |= ((unsigned int)G & 0b111) << 21;
     word |= ((unsigned int)B & 0b111) << 24;  
 
-    return word;
 }
 
-static int DP(unsigned int address, unsigned int ref_point_X, unsigned int ref_point_Y, unsigned int size, unsigned int R, unsigned int G, unsigned int B, unsigned int shape) {
+static void DP(unsigned int address, unsigned int ref_point_X, unsigned int ref_point_Y, unsigned int size, unsigned int R, unsigned int G, unsigned int B, unsigned int shape) {
     unsigned int word = 0;
 
     word |= ((unsigned int)DP_OPCODE & OPCODE_MASK) << 0;
@@ -86,5 +145,4 @@ static int DP(unsigned int address, unsigned int ref_point_X, unsigned int ref_p
     word |= ((unsigned int)B & 0b111) << 36;
     word |= ((unsigned int)shape & 0b1) << 39;
 
-    return word;
 }
