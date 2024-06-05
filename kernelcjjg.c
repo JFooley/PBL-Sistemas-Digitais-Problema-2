@@ -43,13 +43,13 @@ static int dev_release(struct inode *inodep, struct file *filep) {
 }
 
 int charArrayToInt(const char *array) {
-    uint64_t result = 0;
+    unsigned int result = 0;
 
     // Itera sobre os chars do array
     int i;
     for (i = 0; i < 8; i++) {
         // Adiciona 8 bits do char atual ao resultado
-        result |= ((uint64_t)array[i] << (i * 8));
+        result |= ((unsigned int)array[i] << (i * 8));
     }
 
     return result;
