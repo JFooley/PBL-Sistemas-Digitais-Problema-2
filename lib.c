@@ -47,32 +47,51 @@ int simple_driver_close(int fd) {
     return 0;
 }
 
-void intToCharArray(int number, char *array) {
-    // Itera sobre os chars do array
+void intToCharArray(unsigned long long number, char *array) {
     int i;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 7; i++) {
         // Copia 8 bits do número para o char atual do array
         array[i] = (unsigned char)((number >> (i * 8)) & 0xFF);
     }
 }
 
 void printBinaryArray(const unsigned char *array) {
-    int i;
-    printf("Valores em data:\n");
-    for (i = 0; i < 8; i++) {
-        printf("%u ", array[i]);
+    printf("Array na lib:\n");
+    int i, j;
+
+    for (i = 7; i >= 0; i--) {
+        for (j = 7; j >= 0; j--) {
+                printf("%d", (array[i] >> j) & 1);
+            }
+        printf(" ");
     }
+    
     printf("\n");
     printf("\n");
 }
 
-static void WBR_BG(unsigned int R, unsigned int G, unsigned int B) {
-    unsigned int word = 0;
-    
-    word |= ((unsigned int)R & 0b111) << 9;
-    word |= ((unsigned int)G & 0b111) << 12;
-    word |= ((unsigned int)B & 0b111) << 15;
+void printBits(unsigned long long num) {
+    // Determina o tamanho do inteiro em bits
+    int size = 64;
 
+    // Loop através de cada bit do número
+    printf("Long long na lib: \n");
+    int i;
+    for (i = size - 1; i >= 0; i--) {
+        // Verifica se o bit na posição i é 1 ou 0
+        if (num & (1 << i))
+            printf("1");
+        else
+            printf("0");
+
+        // Adiciona espaçamento para melhor visualização
+        if (i % 8 == 0)
+            printf(" ");
+    }
+    printf("\n");
+}
+
+void fileWriter(unsigned long long word) {
     static unsigned char array[8];
 
     intToCharArray(word, array);
@@ -85,7 +104,7 @@ static void WBR_BG(unsigned int R, unsigned int G, unsigned int B) {
         return EXIT_FAILURE;
     }
 
-    ssize_t bytes_written = write(fd, array, sizeof(array));
+    ssize_t bytes_written = write(fd, array, sizeof(array[8]));
     if (bytes_written < 0) {
         perror("Falha ao escrever no dispositivo");
         return -1;
@@ -94,55 +113,70 @@ static void WBR_BG(unsigned int R, unsigned int G, unsigned int B) {
     simple_driver_close(fd);
 }
 
-static void WBR_S(unsigned int reg, unsigned int offset, unsigned int X, unsigned int Y, unsigned int onScreen) {
-    unsigned int word = 0;
+static void WBR_BG(unsigned long long R, unsigned long long G, unsigned long long B) {
+    unsigned long long word = 0;
+    
+    word |= ((unsigned long long)R & 0b111) << 9;
+    word |= ((unsigned long long)G & 0b111) << 12;
+    word |= ((unsigned long long)B & 0b111) << 15;
 
-    word |= ((unsigned int)WBR_OPCODE & OPCODE_MASK) << 0;
-    word |= ((unsigned int)reg & REG_MASK) << 4;
-
-    word |= ((unsigned int)offset & OFFSET_MASK) << 9;
-    word |= ((unsigned int)Y & 0b111111111) << 18;
-    word |= ((unsigned int)X & 0b111111111) << 28;
-    word |= ((unsigned int)onScreen & 0b111111111) << 38;
-
+    fileWriter(word);
 }
 
-static void WSM(unsigned int mem_address, unsigned int R, unsigned int G, unsigned int B) {
-    unsigned int word = 0;
+static void WBR_S(unsigned long long reg, unsigned long long offset, unsigned long long X, unsigned long long Y, unsigned long long onScreen) {
+    unsigned long long word = 0;
 
-    word |= ((unsigned int)WSM_OPCODE & OPCODE_MASK) << 0;
-    word |= ((unsigned int)mem_address & SMEN_OFFSET_MASK) << 4;
+    word |= ((unsigned long long)reg & REG_MASK) << 4;
 
-    word |= ((unsigned int)R & 0b111) << 18;
-    word |= ((unsigned int)G & 0b111) << 21;
-    word |= ((unsigned int)B & 0b111) << 24; 
+    word |= ((unsigned long long)offset & OFFSET_MASK) << 9;
+    word |= ((unsigned long long)Y & 0b111111111) << 18;
+    word |= ((unsigned long long)X & 0b111111111) << 28;
+    word |= ((unsigned long long)onScreen & 0b111111111) << 38;
 
+    printBits(word);
+
+    fileWriter(word);
 }
 
-static void WBM(unsigned int mem_address, unsigned int R, unsigned int G, unsigned int B) {
-    unsigned int word = 0;
+static void WSM(unsigned long long mem_address, unsigned long long R, unsigned long long G, unsigned long long B) {
+    unsigned long long word = 0;
 
-    word |= ((unsigned int)WSM_OPCODE & OPCODE_MASK) << 0;
-    word |= ((unsigned int)mem_address & SMEN_OFFSET_MASK) << 4;
+    word |= ((unsigned long long)WSM_OPCODE & OPCODE_MASK) << 0;
+    word |= ((unsigned long long)mem_address & SMEN_OFFSET_MASK) << 4;
 
-    word |= ((unsigned int)R & 0b111) << 18;
-    word |= ((unsigned int)G & 0b111) << 21;
-    word |= ((unsigned int)B & 0b111) << 24;  
+    word |= ((unsigned long long)R & 0b111) << 18;
+    word |= ((unsigned long long)G & 0b111) << 21;
+    word |= ((unsigned long long)B & 0b111) << 24; 
 
+    fileWriter(word);
 }
 
-static void DP(unsigned int address, unsigned int ref_point_X, unsigned int ref_point_Y, unsigned int size, unsigned int R, unsigned int G, unsigned int B, unsigned int shape) {
-    unsigned int word = 0;
+static void WBM(unsigned long long mem_address, unsigned long long R, unsigned long long G, unsigned long long B) {
+    unsigned long long word = 0;
 
-    word |= ((unsigned int)DP_OPCODE & OPCODE_MASK) << 0;
-    word |= ((unsigned int)address & DPMEN_OFFSET_MASK) << 4;
+    word |= ((unsigned long long)WSM_OPCODE & OPCODE_MASK) << 0;
+    word |= ((unsigned long long)mem_address & SMEN_OFFSET_MASK) << 4;
 
-    word |= ((unsigned int)ref_point_X & REF_POINT_MASK) << 8;
-    word |= ((unsigned int)ref_point_Y & REF_POINT_MASK) << 17;
-    word |= ((unsigned int)size & 0b1111) << 26;
-    word |= ((unsigned int)R & 0b111) << 30;
-    word |= ((unsigned int)G & 0b111) << 33;
-    word |= ((unsigned int)B & 0b111) << 36;
-    word |= ((unsigned int)shape & 0b1) << 39;
+    word |= ((unsigned long long)R & 0b111) << 18;
+    word |= ((unsigned long long)G & 0b111) << 21;
+    word |= ((unsigned long long)B & 0b111) << 24;  
 
+    fileWriter(word);
+}
+
+static void DP(unsigned long long address, unsigned long long ref_point_X, unsigned long long ref_point_Y, unsigned long long size, unsigned long long R, unsigned long long G, unsigned long long B, unsigned long long shape) {
+    unsigned long long word = 0;
+
+    word |= ((unsigned long long)DP_OPCODE & OPCODE_MASK) << 0;
+    word |= ((unsigned long long)address & DPMEN_OFFSET_MASK) << 4;
+
+    word |= ((unsigned long long)ref_point_X & REF_POINT_MASK) << 8;
+    word |= ((unsigned long long)ref_point_Y & REF_POINT_MASK) << 17;
+    word |= ((unsigned long long)size & 0b1111) << 26;
+    word |= ((unsigned long long)R & 0b111) << 30;
+    word |= ((unsigned long long)G & 0b111) << 33;
+    word |= ((unsigned long long)B & 0b111) << 36;
+    word |= ((unsigned long long)shape & 0b1) << 39;
+
+    fileWriter(word);
 }

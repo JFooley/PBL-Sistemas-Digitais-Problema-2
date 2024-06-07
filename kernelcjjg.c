@@ -5,7 +5,6 @@
 #include <linux/uaccess.h>
 #include <asm/io.h>
 #include "address_map_arm.h"
-#include "instructions.c"
 
 #define DEVICE_NAME "gpucjjg"
 
@@ -42,62 +41,88 @@ static int dev_release(struct inode *inodep, struct file *filep) {
     return 0;
 }
 
-int charArrayToInt(const char *array) {
-    unsigned int result = 0;
+unsigned long long charArrayToInt(const char *array) {
+    unsigned long long result = 0;
 
     // Itera sobre os chars do array
     int i;
     for (i = 0; i < 8; i++) {
         // Adiciona 8 bits do char atual ao resultado
-        result |= ((unsigned int)array[i] << (i * 8));
+        result |= ((unsigned int)(array[i] & 0xFF) << (i * 8));
     }
+    
+    printk(KERN_INFO "NUMBER: %d\n", result);
 
     return result;
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
+
     // Copiar os dados do buffer do usuário para o buffer do dispositivo
     if (copy_from_user(device_buffer, buffer, len) != 0) {
         printk(KERN_ERR "Falha ao copiar dados do buffer de usuário para o buffer do dispositivo\n");
         return -EFAULT;
-    }
-
-    // Debug
-    int i;
-    printk(KERN_INFO "Valores em data:\n");
-    for (i = 0; i < 8; i++) {
-        printk(KERN_INFO "%u ", device_buffer[i]);
-    }
+    }    
+   	
     printk(KERN_INFO "\n");
     printk(KERN_INFO "\n");
 
     // Recuper a instrucao
-    unsigned int word = charArrayToInt(device_buffer);
+    unsigned long long word = charArrayToInt(device_buffer);
+    printk(KERN_INFO "word: %d\n", word);
 
-    // Mapear o endereço físico para um endereço virtual
-    pointer_bridge = ioremap(LW_BRIDGE_BASE, LW_BRIDGE_SPAN);
     pointer_dataA = (volatile int *)(pointer_bridge + DATA_A);
     pointer_dataB = (volatile int *)(pointer_bridge + DATA_B);
     pointer_START = (volatile int *)(pointer_bridge + START);
 
-    unsigned int *dataBus[2];
-    *dataBus = WBR_BG(word);
+    unsigned long long dataA = 4;
+    unsigned long long dataB = 0;
+
+    switch (word & 0b1111)
+    {
+    case 0b0000:
+        dataA = word & ((1 << 9) - 1);
+        dataB = word >> 9;
+        break;
+
+    case 0b0001:
+        dataA = word & ((1 << 19) - 1);
+        dataB = word >> 19;
+        break;
+
+    case 0b0010:
+        dataA = word & ((1 << 17) - 1);
+        dataB = word >> 17;
+        break;
+        
+    case 0b0011:
+        dataA = word & ((1 << 9) - 1);
+        dataB = word >> 9;
+        break;
+
+    default:
+        printk(KERN_ERR "kernelcjjg: Instrução não reoconhecida");
+        break;
+    }
+    
+    printk(KERN_INFO "dataBus[0]: %d\n", dataA);
+    printk(KERN_INFO "dataBus[1]: %d\n", dataB);
 
     // Insere no barramento
-    *pointer_dataA = dataBus[1];
-    *pointer_dataB = dataBus[0];
+    *pointer_dataA = dataA;
+    *pointer_dataB = dataB;
+    
+    printk(KERN_INFO "*pointer_dataA: %lu\n", *pointer_dataA);
+    printk(KERN_INFO "*pointer_dataB: %lu\n", *pointer_dataB);
 
-    *pointer_START = 0; 
+    // Autoriza a inserção nas FIFOs
     *pointer_START = 1;
     *pointer_START = 0; 
 
     // Limpa o buffer do dispositivo
-    memset(device_buffer, 0, sizeof(device_buffer));
     memset(buffer, 0, sizeof(buffer));
 
     // Debug
-    printk(KERN_INFO "Data A: %d\n", *pointer_dataA);
-    printk(KERN_INFO "Data B: %d\n", *pointer_dataB);
     printk(KERN_INFO "Dados escritos no dispositivo!\n");
     return len;
 }
@@ -133,6 +158,10 @@ static int __init driver_gpu_init(void) {
         return major;
     }
     printk(KERN_INFO "Dispositivo registrado com sucesso com o número major %d. Para interagir com o driver, crie um arquivo de dispositivo com 'mknod /dev/%s c %d 0'.\n", major, DEVICE_NAME, major);
+    
+    // Mapear o endereço físico para um endereço virtual
+    pointer_bridge = ioremap(LW_BRIDGE_BASE, LW_BRIDGE_SPAN);
+    
     return 0;
 }
 
