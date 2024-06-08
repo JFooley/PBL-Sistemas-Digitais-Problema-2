@@ -27,32 +27,11 @@ int simple_driver_close(int fd) {
     return 0;
 }
 
-void intToCharArray(unsigned long long number, char *array) {
-    int i;
-    for (i = 0; i < 7; i++) {
-        // Copia 8 bits do número para o char atual do array
-        array[i] = (unsigned char)((number >> (i * 8)) & 0xFF);
-    }
-}
-
-void printBinaryArray(const unsigned char *array) {
-    printf("Array na lib:\n");
-
-    int i, j;
-    for (i = 7; i >= 0; i--) {  // Invertendo a ordem dos bytes
-        for (j = 7; j >= 0; j--) {
-            printf("%d", (array[i] >> j) & 1);
-        }
-        printf(" ");
-    }
-    printf("\n\n");
-}
 void printBits(unsigned long long num) {
     // Determina o tamanho do inteiro em bits
     int size = 64;
 
     // Loop através de cada bit do número
-    printf("Long long na lib: \n");
     int i;
     for (i = size - 1; i >= 0; i--) {
         // Verifica se o bit na posição i é 1 ou 0
@@ -69,19 +48,16 @@ void printBits(unsigned long long num) {
 }
 
 void fileWriter(unsigned long long word) {
-    static unsigned char array[8];
 
-    intToCharArray(word, array);
-
-    // debug
-    printBinaryArray(array);
+    printf("ESCREVI ISSO:\n");
+    printBits(word);
 
     int fd = simple_driver_open();
     if (fd < 0) {
         return EXIT_FAILURE;
     }
 
-    ssize_t bytes_written = write(fd, array, 8);
+    ssize_t bytes_written = write(fd, word, 8);
 
     if (bytes_written < 0) {
         perror("Falha ao escrever no dispositivo");

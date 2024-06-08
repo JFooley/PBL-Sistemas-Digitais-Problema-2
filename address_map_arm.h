@@ -1,4 +1,19 @@
-/* Enderecos da GPU*/
+/* Mascaras para extrair os diferentes campos */
+#define OPCODE_MASK 0b1111                 // 4 bits
+#define REG_MASK 0b11111                    // 5 bits
+#define OFFSET_MASK 0b111111111             // 9 bits
+#define SMEN_OFFSET_MASK 0b11111111111111   // 14 bits
+#define BMEN_OFFSET_MASK 0b111111111111     // 12 bits
+#define DPMEN_OFFSET_MASK 0b1111            // 4 bits
+#define REF_POINT_MASK 0b111111111          // 9 bits
+
+/* Instrução */
+#define WBR_OPCODE 0b0000
+#define WSM_OPCODE 0b0001
+#define WBM_OPCODE 0b0010
+#define DP_OPCODE  0b0011
+
+/* Enderecos da GPU */
 #define DATA_A 0x80 // Registrador com opcode e endereçamentos
 #define DATA_B 0x70 // Registradores de dados
 #define START 0xc0  // WRREG
