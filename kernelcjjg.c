@@ -18,9 +18,9 @@ static int device_open = 0;
 #define START 0xc0  // WRREG
 
 // Ponteiros essenciais
-volatile int *pointer_dataA;
-volatile int *pointer_dataB;
-volatile int *pointer_START;
+volatile long long *pointer_dataA;
+volatile long long *pointer_dataB;
+volatile long long *pointer_START;
 void *pointer_bridge;
 
 
@@ -48,12 +48,25 @@ unsigned long long charArrayToInt(const char *array) {
     int i;
     for (i = 0; i < 8; i++) {
         // Adiciona 8 bits do char atual ao resultado
-        result |= ((unsigned int)(array[i] & 0xFF) << (i * 8));
+        result |= ((unsigned long long)(array[i] & 0xFF) << (i * 8));
     }
     
-    printk(KERN_INFO "NUMBER: %d\n", result);
+    printk(KERN_INFO "Array to long: %d\n", result);
 
     return result;
+}
+
+void printBinaryArray(const unsigned char *array) {
+    printk(KERN_INFO "Array na lib:\n");
+
+    int i, j;
+    for (i = 7; i >= 0; i--) {  // Invertendo a ordem dos bytes
+        for (j = 7; j >= 0; j--) {
+            printk(KERN_INFO "%d", (array[i] >> j) & 1);
+        }
+        printk(KERN_INFO " ");
+    }
+    printk(KERN_INFO "\n");
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
@@ -69,11 +82,11 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
 
     // Recuper a instrucao
     unsigned long long word = charArrayToInt(device_buffer);
-    printk(KERN_INFO "word: %d\n", word);
+    printBinaryArray(device_buffer);
 
-    pointer_dataA = (volatile int *)(pointer_bridge + DATA_A);
-    pointer_dataB = (volatile int *)(pointer_bridge + DATA_B);
-    pointer_START = (volatile int *)(pointer_bridge + START);
+    pointer_dataA = (volatile long long *)(pointer_bridge + DATA_A);
+    pointer_dataB = (volatile long long *)(pointer_bridge + DATA_B);
+    pointer_START = (volatile long long *)(pointer_bridge + START);
 
     unsigned long long dataA = 4;
     unsigned long long dataB = 0;
@@ -86,12 +99,12 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
         break;
 
     case 0b0001:
-        dataA = word & ((1 << 19) - 1);
-        dataB = word >> 19;
+        dataA = word & ((1 << 18) - 1);
+        dataB = word >> 18;
         break;
 
     case 0b0010:
-        dataA = word & ((1 << 17) - 1);
+        dataA = word & ((1 << 16) - 1);
         dataB = word >> 17;
         break;
         
@@ -104,16 +117,10 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
         printk(KERN_ERR "kernelcjjg: Instrução não reoconhecida");
         break;
     }
-    
-    printk(KERN_INFO "dataBus[0]: %d\n", dataA);
-    printk(KERN_INFO "dataBus[1]: %d\n", dataB);
 
     // Insere no barramento
     *pointer_dataA = dataA;
     *pointer_dataB = dataB;
-    
-    printk(KERN_INFO "*pointer_dataA: %lu\n", *pointer_dataA);
-    printk(KERN_INFO "*pointer_dataB: %lu\n", *pointer_dataB);
 
     // Autoriza a inserção nas FIFOs
     *pointer_START = 1;

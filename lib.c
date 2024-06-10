@@ -47,26 +47,6 @@ void printBinaryArray(const unsigned char *array) {
     }
     printf("\n\n");
 }
-void printBits(unsigned long long num) {
-    // Determina o tamanho do inteiro em bits
-    int size = 64;
-
-    // Loop através de cada bit do número
-    printf("Long long na lib: \n");
-    int i;
-    for (i = size - 1; i >= 0; i--) {
-        // Verifica se o bit na posição i é 1 ou 0
-        if (num & (1 << i))
-            printf("1");
-        else
-            printf("0");
-
-        // Adiciona espaçamento para melhor visualização
-        if (i % 8 == 0)
-            printf(" ");
-    }
-    printf("\n");
-}
 
 void fileWriter(unsigned long long word) {
     static unsigned char array[8];
@@ -111,13 +91,14 @@ static void WBR_S(unsigned long long reg, unsigned long long offset, unsigned lo
     word |= ((unsigned long long)X & 0b111111111) << 28;
     word |= ((unsigned long long)onScreen & 0b1) << 38;
 
-    printBits(word);
-
     fileWriter(word);
 }
 
-static void WSM(unsigned long long mem_address, unsigned long long R, unsigned long long G, unsigned long long B) {
+static void WSM(unsigned long long reg, unsigned long long pixel, unsigned long long R, unsigned long long G, unsigned long long B) {
     unsigned long long word = 0;
+    unsigned long long mem_address;
+
+    mem_address = ((reg + 1)  * 400) + pixel;
 
     word |= ((unsigned long long)WSM_OPCODE & OPCODE_MASK) << 0;
     word |= ((unsigned long long)mem_address & SMEN_OFFSET_MASK) << 4;
