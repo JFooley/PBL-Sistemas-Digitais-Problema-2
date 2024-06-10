@@ -98,7 +98,7 @@ static void WSM(unsigned long long reg, unsigned long long pixel, unsigned long 
     unsigned long long word = 0;
     unsigned long long mem_address;
 
-    mem_address = ((reg + 1)  * 400) + pixel;
+    mem_address = (reg * 400) + pixel;
 
     word |= ((unsigned long long)WSM_OPCODE & OPCODE_MASK) << 0;
     word |= ((unsigned long long)mem_address & SMEN_OFFSET_MASK) << 4;
@@ -113,7 +113,7 @@ static void WSM(unsigned long long reg, unsigned long long pixel, unsigned long 
 static void WBM(unsigned long long mem_address, unsigned long long R, unsigned long long G, unsigned long long B) {
     unsigned long long word = 0;
 
-    word |= ((unsigned long long)WSM_OPCODE & OPCODE_MASK) << 0;
+    word |= ((unsigned long long)WBM_OPCODE & OPCODE_MASK) << 0;
     word |= ((unsigned long long)mem_address & SMEN_OFFSET_MASK) << 4;
 
     word |= ((unsigned long long)R & 0b111) << 18;

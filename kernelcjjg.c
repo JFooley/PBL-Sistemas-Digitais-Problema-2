@@ -105,12 +105,12 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
 
     case 0b0010:
         dataA = word & ((1 << 16) - 1);
-        dataB = word >> 17;
+        dataB = word >> 16;
         break;
         
     case 0b0011:
-        dataA = word & ((1 << 9) - 1);
-        dataB = word >> 9;
+        dataA = word & ((1 << 8) - 1);
+        dataB = word >> 8;
         break;
 
     default:

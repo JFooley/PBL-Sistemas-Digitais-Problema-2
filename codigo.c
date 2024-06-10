@@ -3,13 +3,19 @@
 
 void main(){
     // Seta backgroud
-    WBR_BG(0, 7, 0);
+    WBR_BG(0, 3, 0);
 
     // Memória de sprites
-    WSM(0, 10, 5, 0, 0);
-
+    unsigned long long i;
+    for (i = 0; i < 400; i++) {
+        WSM(25, i, 7, 0, 0);
+    }
+    
     // Memoria de background
-    // WBM(1, 3, 3, 3);
+    WBM(1, 7, 7, 7);
+
+    //DP
+    DP(1, 0, 0, 0, 6, 7, 7, 0);
 
     // sprites
     WBR_S(1, 1, 50, 100, 1);
@@ -36,9 +42,8 @@ void main(){
     WBR_S(22, 22, 100, 300, 1);
     WBR_S(23, 23, 150, 300, 1);
     WBR_S(24, 24, 200, 300, 1);
-    WBR_S(25, 25, 250, 300, 1);
-
-    // DP
-    
-
+    WBR_S(25, 25, 250, 300, 1);    
+    WBR_S(26, 26, 300, 300, 1);
+    WBR_S(27, 27, 350, 300, 1);
+    WBR_S(28, 28, 400, 300, 1);
 }
