@@ -1,39 +1,76 @@
 #include "lib.c"
 #include <stdio.h>
 
+// Dimensões da tela em blocos
+#define BACKGROUND_WIDTH 80
+#define BACKGROUND_HEIGHT 60
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+
+// Função para limpar a tela
+void clear_lines() {
+    int i;
+    for (i = 0; i < 4800; i++) {
+        WBM(i, 7, 7, 7);
+    }
+}
+
 // Função para desenhar duas linhas verticais
-void draw_vertical_lines() {
-    // Dimensões da tela em blocos
-    const int width_in_blocks = 80;
-    const int height_in_blocks = 60;
-
-    // Coordenadas das colunas onde as linhas serão desenhadas
-    const int line1_column = 20;
-    const int line2_column = 60;
-
-    // Cor para as linhas (vermelho, por exemplo)
-    unsigned long long R = 6;
-    unsigned long long G = 7;
-    unsigned long long B = 7;
-
+void draw_vertical_lines(int pos, int thickness, unsigned long long R, unsigned long long G, unsigned long long B) {
     // Loop para percorrer todas as linhas da tela (em blocos)
     int row;
-    for (row = 0; row < height_in_blocks; row++) {
-        // Calcula o endereço de memória para cada linha nas colunas especificadas
-        unsigned long long mem_address_line1 = ((row * width_in_blocks) + line1_column);
-        unsigned long long mem_address_line2 = ((row * width_in_blocks) + line2_column);
+    int count_thick;
+    int count_pos;
+    unsigned long long mem_address_line1;
+    for (row = 0; row < BACKGROUND_HEIGHT; row++) {
+        count_pos = pos;
+        for (count_thick = 0; count_thick < thickness; count_thick++) {
+            // Calcula o endereço de memória para cada linha nas colunas especificadas
+            mem_address_line1 = ((row * BACKGROUND_WIDTH) + count_pos);
 
-        // Chama a função WBM para desenhar as linhas nas colunas especificadas
-        WBM(mem_address_line1, R, G, B);
-        WBM(mem_address_line2, R, G, B);
+            // Chama a função WBM para desenhar as linhas nas colunas especificadas
+            WBM(mem_address_line1, R, G, B);
+
+            count_pos += 1;
+        }
+    }
+}
+
+void draw_horizontal_line(int line, int thickness, unsigned long long R, unsigned long long G, unsigned long long B) {
+    int row;
+    int j;
+    int line_address;
+    for (row = 0; row < BACKGROUND_HEIGHT; row++) {
+        if (row == line) {
+            for (j = 0; j < (BACKGROUND_WIDTH * thickness); j++) {
+                line_address = j + (BACKGROUND_WIDTH * (row - 1));
+                WBM(line_address, R, G, B);
+            }
+        }
     }
 }
 
 void main(){
-    // Seta backgroud
-    //WBR_BG(0, 0, 7);
+    // Desenho    
+    // WBR_BG(3, 4, 7);
+    // draw_horizontal_line(31, 30, 0, 5, 0);
+    // DP(30, 450, 350, 12, 7, 7, 7, 0); // Tasa
+    // DP(29, 450, 220, 12, 6, 0, 0, 1); // Telhado
+    // DP(1, 430, 355, 3, 2, 2, 0, 0); // porta1
+    // DP(2, 430, 395, 3, 2, 2, 0, 0); // porta 2
+    // DP(3, 480, 360, 2, 4, 4, 7, 0); // Janela
 
-    draw_vertical_lines();
+    int i;
+    for (i = 0; i < SCREEN_WIDTH; i++) {
+        WBR_S(6, 6, i, 100, 1);
+    }
+
+
+
+    // Seta backgroud
+    // WBR_BG(0, 0, 0);
+
+    // clear_lines();
 
     // Memória de sprites
     // unsigned long long i;
@@ -47,7 +84,7 @@ void main(){
     //DP
     //DP(1, 0, 0, 0, 6, 7, 7, 0);
 
-    // sprites
+    // // sprites
     // WBR_S(1, 1, 50, 100, 1);
     // WBR_S(2, 2, 100, 100, 1);
     // WBR_S(3, 3, 150, 100, 1);

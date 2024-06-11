@@ -16,11 +16,13 @@ static int device_open = 0;
 #define DATA_A 0x80 // Registrador com opcode e endereçamentos
 #define DATA_B 0x70 // Registradores de dados
 #define START 0xc0  // WRREG
+#define WRFULL 0xb0
 
 // Ponteiros essenciais
 volatile long long *pointer_dataA;
 volatile long long *pointer_dataB;
 volatile long long *pointer_START;
+volatile long long *pointer_fifo_FULL;
 void *pointer_bridge;
 
 
@@ -87,6 +89,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
     pointer_dataA = (volatile long long *)(pointer_bridge + DATA_A);
     pointer_dataB = (volatile long long *)(pointer_bridge + DATA_B);
     pointer_START = (volatile long long *)(pointer_bridge + START);
+    pointer_fifo_FULL = (volatile long long *)(pointer_bridge + WRFULL);
 
     unsigned long long dataA = 4;
     unsigned long long dataB = 0;
@@ -116,6 +119,10 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
     default:
         printk(KERN_ERR "kernelcjjg: Instrução não reoconhecida");
         break;
+    }
+
+    while (*pointer_fifo_FULL) {
+        continue;
     }
 
     // Insere no barramento
