@@ -43,6 +43,16 @@ Para desenvolver um código capaz de controlar a GPU, primeiro foi necessário e
 
 No geral, a GPU possui 4 instruções: 0000 - Escrita no Banco de Registradores (WBR), 0001 - Escrita na Memória de Sprites (WSM), 0010 - Escrita na Memória de Background (WBM) e 0011 - Definição de um Polígono (DP).
 
+- WBR: Modifica a referencia de memória que o registrador alvo possui adicionando a referencia a uma sprite.
+  
+- WSM: Modifica o valor de um endereço na memória de sprites, ou seja, modifica o valor de um píxel de uma sprite.
+
+- WBM: Modifica o valor de um endereço na memória de background, ou seja, modifica a cor de um dos blocos do background.
+
+- DP: Define a referencia a um poligono de tamanho, cor e posição específica no registrador selecionado.
+
+## O codigo
+
 # 3. Resultados
 
 
