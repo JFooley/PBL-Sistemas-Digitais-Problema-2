@@ -63,6 +63,10 @@ void main(){
     int i;
     for (i = 0; i < SCREEN_WIDTH; i++) {
         WBR_S(6, 6, i, 100, 1);
+        
+        if (i >= SCREEN_WIDTH) [
+            i = 0;
+        ]
     }
 
 
