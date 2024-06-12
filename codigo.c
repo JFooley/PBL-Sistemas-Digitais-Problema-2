@@ -60,16 +60,15 @@ void main(){
     // DP(2, 430, 395, 3, 2, 2, 0, 0); // porta 2
     // DP(3, 480, 360, 2, 4, 4, 7, 0); // Janela
 
-    int i;
-    for (i = 0; i < SCREEN_WIDTH; i++) {
+    int i = 0;
+    while (1) {
         WBR_S(6, 6, i, 100, 1);
-        
+
+        i += 1;
         if (i >= SCREEN_WIDTH) [
             i = 0;
         ]
     }
-
-
 
     // Seta backgroud
     // WBR_BG(0, 0, 0);
