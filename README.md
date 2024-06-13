@@ -55,6 +55,17 @@ No geral, a GPU possui 4 instruções: 0000 - Escrita no Banco de Registradores 
 
 # 3. Resultados
 
+Com o módulo kernel já inicializado, o usuário pode simplesmente incluir o arquivo "lib.c", o qual contém as cinco instruções possíveis de serem realizadas com o Processador Gráfico (Figura 1).
+
+Figura 1: Nome de parâmetros recebidos por cada instrução da biblioteca. <br/>
+![Imagem 1](https://github.com/JFooley/PBL-Sistemas-Digitais-Problema-2/blob/instrucoes1.png)
+
+Embora as instruções indicadas na Figura 1 tenham sido explicadas previamente na seção 2.1, é importante compreender seus parâmetros distintos para utilizá-los adequadamente. A Figura 2 detalha cada um individualmente.
+
+[Figura 2]
+
+
+
 
 # 4. Conclusão
 
