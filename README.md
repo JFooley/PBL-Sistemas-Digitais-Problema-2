@@ -58,5 +58,11 @@ No geral, a GPU possui 4 instruções: 0000 - Escrita no Banco de Registradores 
 
 # 4. Conclusão
 
+Ao concluir este trabalho, adquirimos um conhecimento aprofundado sobre a interação entre software e hardware e a maneira de integrar essas duas áreas por meio de um driver. Exploramos detalhadamente conceitos de mapeamento e manipulação de memória, especialmente no contexto do kit de desenvolvimento DE1-SoC, e aprimoramos nosso entendimento e utilização da linguagem de programação C.
+
+Cumprimos com êxito todos os requisitos estipulados pelo problema. Utilizamos a interface de conexão entre a HPS e a FPGA do DE1-SoC, implementamos uma biblioteca em C no espaço do usuário para funcionalidades da GPU e desenvolvemos um módulo kernel no HPS para o Processador Gráfico.
+
+Apesar de termos concluído todas as funcionalidades previstas com sucesso, identificamos oportunidades para melhorias futuras. A principal sugestão seria expandir as funcionalidades da GPU, ampliando a biblioteca disponível para oferecer ao usuário final uma gama ainda maior de possibilidades de uso da GPU.
+
 
 # Referências
