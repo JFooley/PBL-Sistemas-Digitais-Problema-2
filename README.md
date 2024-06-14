@@ -51,7 +51,30 @@ No geral, a GPU possui 4 instruções: 0000 - Escrita no Banco de Registradores 
 
 - DP: Define a referencia a um poligono de tamanho, cor e posição específica no registrador selecionado.
 
-## O codigo
+## 2.2 Módulo Kernel
+O módulo kernel desenvolvido é responsável por facilitar a comunicação entre o sistema operacional e a GPU, permitindo que aplicativos e processos enviem instruções e dados para a GPU e recebam resultados de volta. É interessante destacar que é definido o nome do dispositivo como "gpucjjg", que será utilizado para acessar a GPU.
+
+Dentro do código, foram incluídas variáveis globais e ponteiros que são essenciais para o funcionamento do módulo. Estes incluem uma variável para armazenar o número major do dispositivo, um buffer de 8 bytes para comunicação com o dispositivo e ponteiros voláteis para acessar os registradores de controle e as FIFOs da GPU. Esses elementos são cruciais para garantir a comunicação eficiente entre o módulo de kernel e o Processador Gráfico.
+
+O módulo de kernel inclui funções específicas para abrir, fechar, ler e escrever no dispositivo. A função de abertura (dev_open) garante que apenas um processo por vez possa acessar o dispositivo, enquanto a função de fechamento (dev_release) libera o dispositivo após o término do acesso. A função de escrita (dev_write) é responsável por receber os dados do usuário, interpretar as instruções contidas nesses dados e enviar os comandos correspondentes para a GPU. Por outro lado, a função de leitura (dev_read) copia os dados do dispositivo de volta para o espaço do usuário.
+
+Além disso, foi necessário implementar as funções de inicialização e desinstalação do módulo de kernel. Durante a inicialização, o número major do dispositivo é registrado, permitindo que os processos acessem o dispositivo de maneira exclusiva. Ademais, o endereço físico da ponte é mapeado para um endereço virtual, facilitando o acesso aos registradores e FIFOs da GPU.
+
+## 2.3 Biblioteca
+A biblioteca foi desenvolvida para permitir a interação do usuário com a GPU por meio do módulo kernel. Este conjunto de funções é destinado a simplificar o processo de envio de instruções e dados para o Processador Gráfico, abstraindo a complexidade do acesso direto aos registradores e FIFOs da GPU.
+
+A função `simple_driver_open()` é responsável por abrir o dispositivo de GPU para comunicação. Ela utiliza a função `open()` para abrir o arquivo de dispositivo associado à GPU, definido pela constante `DEVICE_FILE`. Em caso de falha na abertura do dispositivo, uma mensagem de erro é exibida.
+
+Por sua vez, a função `simple_driver_close()` fecha o dispositivo de GPU previamente aberto. Ela utiliza a função `close()` para fechar o arquivo de dispositivo, liberando recursos associados a ele.
+
+A função `intToCharArray()` converte um número inteiro de 64 bits que representa a instrução completa, em um array de caracteres de 8 bytes. Ela realiza uma operação de deslocamento de bits para extrair cada byte do número e armazená-lo no array de caracteres para que essa informação seja recebida da maneira correta pelo kernel, uma vez que ele é um Char Device.
+
+A função `fileWriter()` é responsável por escrever uma palavra de 64 bits no dispositivo de GPU. Ela invoca a função `simple_driver_open()` para abrir o dispositivo, escreve os dados no dispositivo utilizando a função `write()` e, em seguida, fecha o dispositivo com a função `simple_driver_close()`.
+
+As demais funções (`WBR_BG()`, `WBR_S()`, `WSM()`, `WBM()` e `DP()`) representam instruções específicas que podem ser enviadas para a GPU (seção 2.1). Cada uma dessas funções recebe parâmetros correspondentes aos campos da instrução a ser enviada e constrói a palavra de 64 bits representando essa instrução. Em seguida, elas chamam a função `fileWriter()` para enviar a instrução para o dispositivo de GPU.
+
+De maneira geral, a biblioteca encapsula a lógica de comunicação com a GPU e fornece uma interface simplificada para o usuário interagir com a GPU por meio do módulo kernel. Ela facilita o desenvolvimento de programas que fazem uso da GPU para processamento gráfico.
+
 
 # 3. Resultados
 
