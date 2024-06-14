@@ -71,7 +71,7 @@ A função `intToCharArray()` converte um número inteiro de 64 bits que represe
 
 A função `fileWriter()` é responsável por escrever uma palavra de 64 bits no dispositivo de GPU. Ela invoca a função `simple_driver_open()` para abrir o dispositivo, escreve os dados no dispositivo utilizando a função `write()` e, em seguida, fecha o dispositivo com a função `simple_driver_close()`.
 
-As demais funções (`WBR_BG()`, `WBR_S()`, `WSM()`, `WBM()` e `DP()`) representam instruções específicas que podem ser enviadas para a GPU (seção 2.1). Cada uma dessas funções recebe parâmetros correspondentes aos campos da instrução a ser enviada e constrói a palavra de 64 bits representando essa instrução. Em seguida, elas chamam a função `fileWriter()` para enviar a instrução para o dispositivo de GPU.
+As demais funções (`WBR_BG()`, `WBR_S()`, `WSM()`, `WBM()` e `DP()`) representam instruções específicas que podem ser enviadas para a GPU (seções 2.1 e 3). Cada uma dessas funções recebe parâmetros correspondentes aos campos da instrução a ser enviada e constrói a palavra de 64 bits representando essa instrução. Em seguida, elas chamam a função `fileWriter()` para enviar a instrução para o dispositivo de GPU.
 
 # 3. Resultados
 
