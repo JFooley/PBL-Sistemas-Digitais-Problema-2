@@ -58,13 +58,19 @@ No geral, a GPU possui 4 instruções: 0000 - Escrita no Banco de Registradores 
 Com o módulo kernel já inicializado, o usuário pode simplesmente incluir o arquivo "lib.c", o qual contém as cinco instruções possíveis de serem realizadas com o Processador Gráfico (Figura 1).
 
 Figura 1: Nome de parâmetros recebidos por cada instrução da biblioteca. <br/>
-![Imagem 1](https://github.com/JFooley/PBL-Sistemas-Digitais-Problema-2/blob/instrucoes1.png)
+![Imagem 1](https://github.com/JFooley/PBL-Sistemas-Digitais-Problema-2/blob/main/instrucoes1.png)
 
 Embora as instruções indicadas na Figura 1 tenham sido explicadas previamente na seção 2.1, é importante compreender seus parâmetros distintos para utilizá-los adequadamente. A Figura 2 detalha cada um individualmente.
 
-[Figura 2]
+Figura 2: Detalhamento dos parâmetros das instruções. <br/>
+![Imagem 2](https://github.com/JFooley/PBL-Sistemas-Digitais-Problema-2/blob/main/instrucoes2.png)
 
+Respeitando as limitações da plataforma onde a GPU está instalada, o usuário tem a liberdade de criar interfaces gráficas conforme desejado, utilizando as instruções fornecidas. Para ilustrar este processo, é interessante examinar o código presente no arquivo "codigo.c", dentro da função "main". Um exemplo dessa saída pode ser observado na Figura 3.
 
+Figura 3: Exemplo de saída. <br/>
+![Imagem 2](https://github.com/JFooley/PBL-Sistemas-Digitais-Problema-2/blob/main/exemploSaida.jpeg)
+
+Utilizando apenas as instruções disponíveis na biblioteca, foi possível gerar o cenário acima, o qual inclui não apenas elementos estáticos na tela, mas também o movimento da espaçonave e dos tiros por ela disparados.
 
 
 # 4. Conclusão
