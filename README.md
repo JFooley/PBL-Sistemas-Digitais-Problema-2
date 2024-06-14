@@ -73,9 +73,6 @@ A função `fileWriter()` é responsável por escrever uma palavra de 64 bits no
 
 As demais funções (`WBR_BG()`, `WBR_S()`, `WSM()`, `WBM()` e `DP()`) representam instruções específicas que podem ser enviadas para a GPU (seção 2.1). Cada uma dessas funções recebe parâmetros correspondentes aos campos da instrução a ser enviada e constrói a palavra de 64 bits representando essa instrução. Em seguida, elas chamam a função `fileWriter()` para enviar a instrução para o dispositivo de GPU.
 
-De maneira geral, a biblioteca encapsula a lógica de comunicação com a GPU e fornece uma interface simplificada para o usuário interagir com a GPU por meio do módulo kernel. Ela facilita o desenvolvimento de programas que fazem uso da GPU para processamento gráfico.
-
-
 # 3. Resultados
 
 Com o módulo kernel já inicializado, o usuário pode simplesmente incluir o arquivo "lib.c", o qual contém as cinco instruções possíveis de serem realizadas com o Processador Gráfico (Figura 1).
